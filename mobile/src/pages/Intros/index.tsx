@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import React, { useState, useRef, useEffect } from 'react'
+import { View, Text, StyleSheet, Image, Animated, Easing } from 'react-native'
 import AppIntroSlider from 'react-native-app-intro-slider';
+import { Feather } from '@expo/vector-icons'
+import Login from '../Login';
 
 const slides = [
     {
@@ -28,6 +30,27 @@ const slides = [
 
 const Intro = () => {
     const [showIntro, setShowIntro] = useState(false)
+    const fadeAnim = useRef(new Animated.Value(0)).current
+    const fadeIn = () => {
+        // Will change fadeAnim value to 1 in 5 seconds
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            useNativeDriver: true,
+            duration: 2500
+        }).start();
+    };
+
+    const fadeOut = () => {
+        // Will change fadeAnim value to 0 in 5 seconds
+        Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 5000
+        }).start();
+    };
+
+    useEffect(() => {
+        fadeIn()
+    }, [])
 
     const _renderItem = ({ item }) => {
         return (
@@ -36,29 +59,52 @@ const Intro = () => {
                     <Text style={styles.title}>{item.title}</Text>
                 </View>
                 <View style={styles.bodySlide}>
-                    <Image style={{ height: 200, resizeMode: 'contain' }} source={item.image} />
+                    <Animated.View
+                        style={
+                            { opacity: fadeAnim } // Bind opacity to animated value
+                        }
+
+                    >
+                        <Image style={{ height: 200, resizeMode: 'contain' }} source={item.image} />
+                    </Animated.View>
                     <Text style={styles.subtitle}>{item.text}</Text>
                 </View>
             </View>
         );
     }
-    const _onDone = () => {
-        // User finished the introduction. Show real app through
-        // navigation or simply by controlling state
-        setShowIntro(true)
+
+    const _renderNextButton = () => {
+        return (
+            <View style={styles.buttonCircle}>
+                <Feather name='arrow-right' size={20} color='#FAFAFA' />
+            </View>
+        )
     }
 
     const _renderDoneButton = () => {
         return (
-          <View style={styles.buttonCircle}>
-            <Text> {">"} </Text>
-          </View>
-        );
-      };
+            <View style={styles.buttonCircle}>
+                <Text><Feather name='check' size={20} color='#FAFAFA' /></Text>
+            </View>
+        )
+    }
+
     return (
-        <View style={styles.container}>
-            <AppIntroSlider renderItem={_renderItem} activeDotStyle={styles.indicator} renderDoneButton={_renderDoneButton} data={slides} onDone={_onDone} />
-        </View>
+        <>
+            {!showIntro ?
+                <View style={styles.container}>
+                    <AppIntroSlider renderItem={_renderItem}
+                        activeDotStyle={styles.indicator}
+                        renderDoneButton={_renderDoneButton}
+                        data={slides}
+                        //onSlideChange={fadeIn}
+                        onDone={() => setShowIntro(!showIntro)}
+                        renderNextButton={_renderNextButton}
+                    />
+                </View>
+                : <Login />
+            }
+        </>
     )
 }
 
@@ -77,12 +123,12 @@ const styles = StyleSheet.create({
 
     },
 
-    indicator:{
+    indicator: {
         backgroundColor: 'rgba(71, 153, 247, .9)'
     },
 
     slideHeader: {
-        marginTop:170
+        marginTop: 170
     },
 
     title: {
@@ -91,10 +137,10 @@ const styles = StyleSheet.create({
         color: '#585858'
     },
 
-    bodySlide:{
-        flex:1,
+    bodySlide: {
+        flex: 1,
         justifyContent: "center",
-        alignItems:"center"
+        alignItems: "center"
     },
 
     subtitle: {
@@ -111,7 +157,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-      },
+    },
 })
 
 
