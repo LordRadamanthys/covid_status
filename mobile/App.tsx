@@ -1,21 +1,28 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { AppLoading } from 'expo';
+import { Inter_400Regular, Inter_500Medium, useFonts } from '@expo-google-fonts/inter'
 import Stack from './src/routes/Stack'
+
 export default function App() {
-  return (
-    <>
-      <Stack />
-      <StatusBar style="auto" />
-    </>
-  );
+
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_400Regular
+
+  })
+
+
+
+  if (!fontsLoaded) {
+    return <AppLoading />
+  } else {
+    return (
+      <>
+        <Stack />
+        <StatusBar style="auto" />
+      </>
+    );
+  }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
