@@ -1,9 +1,16 @@
-import React, { useState } from 'react'
-import { View, Picker, Text, StyleSheet, Image } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Picker, Text, StyleSheet, Image, Dimensions } from 'react-native'
 import Constants from 'expo-constants'
 import { Feather } from '@expo/vector-icons'
-
-
+import {
+    LineChart,
+    BarChart,
+    PieChart,
+    ProgressChart,
+    ContributionGraph,
+    StackedBarChart
+} from "react-native-chart-kit";
+import api from '../../../services/api';
 
 
 
@@ -14,6 +21,57 @@ const TabPersonal = () => {
     function getValuePickerCity(value: string) {
         setSelectedPickerCity(value)
     }
+
+
+
+    // function fromartData(){
+    //     {
+    //         labels: ["January", "February", "March", "April", "May", "June"],
+    //         datasets: [
+    //             {
+    //                 data: [
+    //                     650,
+    //                     600,
+    //                     500,
+    //                     400,
+    //                     300,
+    //                     700
+    //                 ]
+    //             }
+    //         ]
+    //     }
+    // }
+    async function getDataApi() {
+        api.get('v1/brazil/uf/sp').then(response => {
+            console.log(response.data)
+
+
+        }).catch(erro => {
+            console.log(erro)
+        })
+    }
+    const data = {
+        labels: ["January", "February", "March", "April", "May", "June"],
+        datasets: [
+            {
+                data: [20, 45, 28, 80, 99, 43]
+            }
+        ]
+    };
+    const chartConfig = {
+        backgroundGradientFrom: "#4799F7",
+        backgroundGradientFromOpacity: 0,
+        backgroundGradientTo: "#4799F7",
+        backgroundGradientToOpacity: 0.5,
+        color: (opacity = 1) => `rgba(333, 25, 146, ${opacity})`,
+        strokeWidth: 2, // optional, default 3
+        barPercentage: 0.5,
+        useShadowColorFromDataset: false // optional
+    };
+    useEffect(() => {
+        getDataApi()
+    }, [])
+
     return (
         <View style={styles.container}>
             <View style={styles.pickerSelectCityContainer}>
@@ -30,8 +88,21 @@ const TabPersonal = () => {
                         <Picker.Item label="JavaScript" value="js" color='black' />
                     </Picker>
                 </View>
-            </View>
 
+            </View>
+            <View>
+                <Text>Bezier Line Chart</Text>
+                <BarChart
+                    yAxisLabel="$"
+                    yAxisSuffix="k"
+                    style={{ borderRadius: 16 }}
+                    data={data}
+                    width={Dimensions.get("window").width}
+                    height={220}
+                    chartConfig={chartConfig}
+                    verticalLabelRotation={30}
+                />
+            </View>
         </View>
     )
 }
@@ -48,7 +119,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 10,
         flexDirection: 'row',
-      //  backgroundColor: '#f3f'
+        //  backgroundColor: '#f3f'
     },
 
     calendarInfoHeader: {
