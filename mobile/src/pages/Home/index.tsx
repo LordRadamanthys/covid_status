@@ -23,9 +23,9 @@ const Home = () => {
                 tabStyle: { borderRadius: 5 },
                 labelStyle: { fontFamily: 'Inter_400Regular', fontSize: 19 },
                 activeTintColor: '#FFF',
-                inactiveTintColor: '#585858',
+                inactiveTintColor: false? '#fff' : '#585858',
                 pressColor: '#4799F7',
-                style: { backgroundColor: '#F0F0F0', elevation: 9 },
+                style: { backgroundColor: false ?  '#232222' : '#F0F0F0', elevation: 9 },
                 indicatorStyle: { height: '100%',  backgroundColor: '#4799F7', borderRadius: 5 },
             }}>
                 <Tab.Screen name="Brasil" component={TabPersonal} />
@@ -41,14 +41,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: Constants.statusBarHeight + 15,
-        backgroundColor: '#F0F0F0'
+        backgroundColor: false ? '#232222' : '#F0F0F0'
     },
 
     header: {
         justifyContent: 'space-between',
         padding: 30,
         flexDirection: 'row',
-        backgroundColor: '#F0F0F0'
+        backgroundColor: false ? '#232222' : '#F0F0F0'
     },
 
     calendarInfoHeader: {

@@ -4,17 +4,18 @@ import Constants from 'expo-constants'
 import { Feather } from '@expo/vector-icons'
 import { RectButton } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
+import statesBrazil from '../../services/StatesBrazil'
 
 
 const Login = () => {
-    const [dataPickerCity, setDataPickerCity] = useState(['SP', 'SP'])
-    const [dataPickerCountry, setDataPickerCountry] = useState(['teste', 'teste1'])
+
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
     const [selectedPickerCity, setSelectedPickerCity] = useState('')
-    const [selectedPickerCountry, setSelectedPickerCountry] = useState('')
     const navigate = useNavigation()
 
-    function goToHome(){
-        navigate.navigate('Home')
+    function goToHome() {
+        navigate.navigate('Home', {uf:selectedPickerCity})
     }
 
 
@@ -23,10 +24,6 @@ const Login = () => {
         console.log(value)
     }
 
-    function getValuePickerCountry(value: string) {
-        setSelectedPickerCountry(value)
-        console.log(value)
-    }
     return (
         <View style={styles.container}>
             <KeyboardAvoidingView behavior='position'>
@@ -40,10 +37,11 @@ const Login = () => {
                     <View style={styles.input}>
                         <Feather style={{ marginEnd: 10 }} name="user" size={25} color="#4799F7" />
                         <TextInput
+                            value={name}
                             style={{ width: '80%' }}
                             placeholderTextColor={'rgba(88, 88, 88, 0.4)'}
                             placeholder="Type your name"
-                            onChangeText={() => { }} />
+                            onChangeText={setName} />
                     </View>
 
                     <View style={styles.input}>
@@ -52,25 +50,13 @@ const Login = () => {
                             style={{ width: '80%' }}
                             placeholderTextColor={'rgba(88, 88, 88, 0.4)'}
                             placeholder="Type your email"
-                            value={''}
-                            onChangeText={() => { }} />
+                            value={email}
+                            onChangeText={setEmail} />
                     </View>
+
 
                     <View style={styles.input}>
                         <Feather style={{ marginEnd: 10 }} name="map-pin" size={25} color="#4799F7" />
-                        <Picker
-                            selectedValue={selectedPickerCountry}
-                            style={{ width: '90%' }}
-                            onValueChange={(itemValue, itemIndex) => getValuePickerCountry(itemValue)}
-                        >
-                            <Picker.Item label="Select your Country" value="" color='rgba(88, 88, 88, 0.4)' />
-                            <Picker.Item label="Java" value="java" color='black' />
-                            <Picker.Item label="JavaScript" value="js" color='black' />
-                        </Picker>
-                    </View>
-
-                    <View style={styles.input}>
-                        <Feather style={{ marginEnd: 10 }} name="map" size={25} color="#4799F7" />
                         <Picker
 
                             selectedValue={selectedPickerCity}
@@ -78,8 +64,12 @@ const Login = () => {
                             onValueChange={(itemValue, itemIndex) => getValuePickerCity(itemValue)}
                         >
                             <Picker.Item label="Select your City" value="" color='rgba(88, 88, 88, 0.4)' />
-                            <Picker.Item label="Java" value="java" color='black' />
-                            <Picker.Item label="JavaScript" value="js" color='black' />
+                            {statesBrazil.map(state => {
+                                return (
+                                    <Picker.Item key={state.id_uf} label={state.nome} value={state.sigla} color='black' />
+                                )
+                            })}
+
                         </Picker>
                     </View>
 
@@ -97,7 +87,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: Constants.statusBarHeight + 15,
-        backgroundColor: '#FAFAFA'
+        backgroundColor: false ? '#1C1C1C' : '#FAFAFA'
     },
 
     header: {
@@ -138,6 +128,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
+        marginTop: 40,
         paddingHorizontal: 60,
         paddingVertical: 20,
         backgroundColor: '#4799F7',
