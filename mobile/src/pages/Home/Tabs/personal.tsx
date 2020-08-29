@@ -4,16 +4,18 @@ import Constants from 'expo-constants'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import statesBrazil from '../../../services/StatesBrazil'
 import { Feather } from '@expo/vector-icons'
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
-} from "react-native-chart-kit";
+import { BarChart, Grid } from 'react-native-svg-charts'
+// import {
+//     LineChart,
+//     BarChart,
+//     PieChart,
+//     ProgressChart,
+//     ContributionGraph,
+//     StackedBarChart
+// } from "react-native-chart-kit";
 import api from '../../../services/api';
 import { ScrollView } from 'react-native-gesture-handler'
+import CardState from '../../../components/card_states'
 
 
 
@@ -23,7 +25,7 @@ const TabPersonal = () => {
     const [statesDeaths, setStateDeaths] = useState(0)
     const [statesCases, setStateCases] = useState(0)
 
-    const [dataStates, setDataStates] = useState()
+    const [dataStates, setDataStates] = useState([])
     const [dataCountry, setDataCountry] = useState()
     const [dataCountryDeaths, setDataCountryDeaths] = useState()
     const [dataCountryCases, setDataCountryCases] = useState()
@@ -34,6 +36,26 @@ const TabPersonal = () => {
         setSelectedPickerCity(value)
     }
 
+    const fill = 'rgb(255,000, 000,0.8)'
+    const data = [undefined, 50, undefined, 10, undefined]
+    const CUT_OFF = 20
+    const Labels = ({ x, y, bandwidth, data }) => (
+        data.map((value, index) => (
+            <Text
+                key={index}
+                x={x(index) + (bandwidth / 2)}
+                y={value < CUT_OFF ? y(value) - 10 : y(value) + 15}
+                fontSize={14}
+                fill={value >= CUT_OFF ? 'white' : 'black'}
+                alignmentBaseline={'middle'}
+                textAnchor={'middle'}
+            >
+                {value}
+            </Text>
+        ))
+    )
+
+
     async function getAllStatusOfState(state: string = 'sp') {
         api.get(`v1/brazil/uf/${state}`).then(response => {
 
@@ -41,13 +63,15 @@ const TabPersonal = () => {
                 labels: ["Mortes", "Casos", "suspeitos"],
                 datasets: [
                     {
-                        data: [response.data.deaths, response.data.cases, response.data.suspects]
+                        data: [undefined, response.data.deaths, undefined, response.data.cases, undefined, response.data.suspects, undefined]
                     }
                 ]
             };
+
+            const dataTop = [undefined, Number(response.data.deaths), undefined, Number(response.data.cases), undefined, Number(response.data.suspects)]
             // setStateDeaths(response.data.deaths)
             // setStateCases(response.data.cases)
-            setDataStates(formatDate)
+            setDataStates(dataTop)
 
 
         }).catch(erro => {
@@ -58,6 +82,7 @@ const TabPersonal = () => {
 
     function getFormatData() {
         const date = new Date()
+        
         if (date.getMonth() > 9) {
             return `${date.getFullYear()}${date.getMonth()}${date.getDate()}`
         } else {
@@ -163,28 +188,8 @@ const TabPersonal = () => {
 
             </View>
 
-            <View style={{ justifyContent: 'center', alignItems: 'center', marginHorizontal: 60 }}>
-                <Text style={[styles.title, { marginVertical: 15 }]}>Hoje</Text>
-                <BarChart
-                    yAxisLabel=""
-                    yAxisSuffix=""
-                    withHorizontalLabels={false}
-                    withInnerLines={true}
-                    showValuesOnTopOfBars={true}
-                    style={{ borderRadius: 10 }}
-                    fromZero={true}
-                    segments={1}
-                    data={!dataStates ? dataInit : dataStates}
-                    width={Dimensions.get("window").width - 20}
-                    height={280}
-                    chartConfig={chartConfig}
-                    verticalLabelRotation={0}
-                />
-
-
-
-            </View>
-        </View>
+            <CardState />
+        </View >
     )
 }
 
@@ -222,7 +227,7 @@ const styles = StyleSheet.create({
     },
 
     containerStatus: {
-        marginTop:10,
+        marginTop: 10,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
