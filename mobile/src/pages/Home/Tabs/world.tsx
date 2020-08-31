@@ -1,34 +1,47 @@
-import React, { useState } from 'react'
-import { View, Picker, Text, StyleSheet, Image } from 'react-native'
-import Constants from 'expo-constants'
+import React, { useState, useEffect } from 'react'
+import { View, StyleSheet, FlatList } from 'react-native'
 import { Feather } from '@expo/vector-icons'
+import CardState from '../../../components/card_states'
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
+import api from '../../../services/api'
 
 
 const TabWorld = () => {
-    const [dataPickerCountry, setDataPickerCountry] = useState(['teste', 'teste1'])
-    const [selectedPickerCity, setSelectedPickerCity] = useState('')
+    const [dataWorld, setDataWorld] = useState()
 
-    function getValuePickerCity(value: string) {
-        setSelectedPickerCity(value)
+    async function getAllDataWorld() {
+        setDataWorld(undefined)
+        api.get(`v1/countries`).then(response => {
+
+            setDataWorld(response.data.data)
+        }).catch(erro => {
+            console.log(erro)
+        })
     }
+    const renderItem = ({ item }) => {
+
+        return <CardState id={item.id} title={item.country} deaths={item.deaths} cases={item.cases} />
+    }
+
+    useEffect(() => {
+        getAllDataWorld()
+
+    }, [])
     return (
         <View style={styles.container}>
-            <View style={styles.pickerSelectCityContainer}>
-                <View style={styles.input}>
-                    <Feather style={{ marginEnd: 10 }} name="map" size={25} color="#4799F7" />
-                    <Picker
 
-                        selectedValue={selectedPickerCity}
-                        style={{ width: '90%' }}
-                        onValueChange={(itemValue, itemIndex) => getValuePickerCity(itemValue)}
-                    >
-                        <Picker.Item label="Select another city" value="" color='rgba(88, 88, 88, 0.4)' />
-                        <Picker.Item label="Java" value="java" color='black' />
-                        <Picker.Item label="JavaScript" value="js" color='black' />
-                    </Picker>
-                </View>
-            </View>
+            {!dataWorld ? <ShimmerPlaceHolder autoRun={true} visible={false} style={{ width: '100%', height: 150, borderRadius: 5, }} />
 
+                :
+                <View style={{ flex: 1, marginBottom: 0 }}>
+                    <FlatList
+                        onRefresh={getAllDataWorld}
+                        refreshing={false}
+                        data={dataWorld}
+                        renderItem={renderItem}
+                        keyExtractor={item => item.id}
+                    />
+                </View>}
         </View>
     )
 }
@@ -36,7 +49,7 @@ const TabWorld = () => {
 
 const styles = StyleSheet.create({
 
-   
+
     container: {
         flex: 1,
         backgroundColor: '#FAFAFA'
@@ -46,7 +59,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 10,
         flexDirection: 'row',
-      //  backgroundColor: '#f3f'
+        //  backgroundColor: '#f3f'
     },
 
     calendarInfoHeader: {

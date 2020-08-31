@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { View, Picker, Text, StyleSheet, Image, Dimensions, FlatList } from 'react-native'
-import Constants from 'expo-constants'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import statesBrazil from '../../../services/StatesBrazil'
+import { useRoute } from '@react-navigation/native'
+
 import { Feather } from '@expo/vector-icons'
-import { BarChart, Grid } from 'react-native-svg-charts'
+
 import CovidInterface from '../../../Interfaces/CovidData'
-// import {
-//     LineChart,
-//     BarChart,
-//     PieChart,
-//     ProgressChart,
-//     ContributionGraph,
-//     StackedBarChart
-// } from "react-native-chart-kit";
+
 import api from '../../../services/api';
 import { ScrollView } from 'react-native-gesture-handler'
 import CardState from '../../../components/card_states'
 import formatCurrency from '../../../functions/formatCurrency'
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
 
 
 
@@ -34,13 +27,11 @@ const TabPersonal = () => {
     const [dataCountryConfirmed, setDataCountryConfirmed] = useState()
     const [dataCountryRecovered, setDataCountryRecovered] = useState()
 
-    function getValuePickerCity(value: string) {
-        setSelectedPickerCity(value)
-    }
 
 
 
     async function getAllStatusOfState() {
+        setDataStates(undefined)
         api.get(`v1`).then(response => {
 
             setDataStates(response.data.data)
@@ -51,34 +42,15 @@ const TabPersonal = () => {
     }
 
 
-    function getFormatData() {
-        const date = new Date()
-
-        if (date.getMonth() > 9) {
-            return `${date.getFullYear()}${date.getMonth()}${date.getDate()}`
-        } else {
-            return `${date.getFullYear()}0${date.getMonth()}${date.getDate()}`
-        }
-    }
-
 
     async function getStatusOfCountry(uf: string = 'brazil') {
-
+        setDataCountryDeaths(undefined)
         api.get(`v1/brazil`).then(response => {
-            const formatDate = {
-                labels: ["Mortes", "Casos", "Confirmados"],
-                datasets: [
-                    {
-                        data: [response.data.data.deaths, response.data.data.cases, response.data.data.confirmed]
-                    }
-                ]
-            };
 
             setDataCountryCases(response.data.data.cases)
             setDataCountryDeaths(response.data.data.deaths)
             setDataCountryConfirmed(response.data.data.confirmed)
             setDataCountryRecovered(response.data.data.recovered)
-            //setDataCountry(formatDate)
 
         }).catch(erro => {
             console.log(erro)
@@ -86,22 +58,15 @@ const TabPersonal = () => {
     }
 
 
-
-
-
-
-  
     useEffect(() => {
         getStatusOfCountry()
-        const value = !selectedPickerCity ? route.params : selectedPickerCity
         getAllStatusOfState()
-        // getStatusOfStateToday()
     }, [selectedPickerCity])
 
 
     const renderItem = ({ item }) => {
 
-        return <CardState title={item.state} deaths={222} cases={222} />
+        return <CardState id={item.id} title={item.state} deaths={item.deaths} cases={item.cases} />
     }
 
     return (
@@ -110,15 +75,21 @@ const TabPersonal = () => {
             <View style={styles.containerStatus}>
                 <Text style={[styles.title]}>Total Brasil</Text>
                 <View style={styles.containerDataStatus}>
-                    <View style={[styles.status, { backgroundColor: '#CE2727' }]}>
-                        <Text style={{ color: '#fff', fontFamily: 'Inter_500Medium' }}>{`${formatCurrency((Number(dataCountryDeaths)))}`}</Text>
-                        <Text style={{ color: '#fff', fontFamily: 'Inter_400Regular' }}>Mortes</Text>
-                    </View>
+                    {!dataCountryDeaths ? <>
+                        <ShimmerPlaceHolder style={{ width: 90, height: 90, borderRadius: 5, marginHorizontal: 20 }} autoRun={true} visible={false} />
+                        <ShimmerPlaceHolder style={{ width: 90, height: 90, borderRadius: 5 }} autoRun={true} visible={false} /></>
+                        : <>
+                            <View style={[styles.status, { backgroundColor: '#CE2727' }]}>
+                                <Text style={{ color: '#fff', fontFamily: 'Inter_400Regular', fontWeight: '700' }}>Mortes</Text>
+                                <Text style={{ color: '#fff', fontFamily: 'Inter_500Medium' }}>{`${formatCurrency((Number(dataCountryDeaths)))}`}</Text>
+                            </View>
 
-                    <View style={[styles.status, { backgroundColor: '#FFD600' }]}>
-                        <Text style={{ color: 'black', fontFamily: 'Inter_500Medium' }}>{`${formatCurrency((Number(dataCountryConfirmed)))}`}</Text>
-                        <Text style={{ color: 'black', fontFamily: 'Inter_400Regular' }}>Casos</Text>
-                    </View>
+                            <View style={[styles.status, { backgroundColor: '#FFD600' }]}>
+                                <Text style={{ color: 'black', fontFamily: 'Inter_400Regular', fontWeight: '700' }}>Casos</Text>
+                                <Text style={{ color: 'black', fontFamily: 'Inter_500Medium' }}>{`${formatCurrency((Number(dataCountryConfirmed)))}`}</Text>
+                            </View>
+                        </>
+                    }
 
                 </View>
             </View>
@@ -142,14 +113,22 @@ const TabPersonal = () => {
                 </View>
 
             </View> */}
-            <View>
-                <FlatList
-                    data={dataStates}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                />
-            </View>
-            {/* <CardState /> */}
+            {!dataStates ? <ShimmerPlaceHolder autoRun={true} visible={false} style={{ width: '100%', height: 150, borderRadius: 5, }}>
+                <CardState title='' id={0} cases={0} deaths={0} />
+            </ShimmerPlaceHolder>
+                :
+                <View style={{ flex: 1, marginBottom: 0 }}>
+                    <FlatList
+                        data={dataStates}
+                        renderItem={renderItem}
+                        keyExtractor={item => item.id}
+                        onRefresh={() => {
+                            getAllStatusOfState()
+                            getStatusOfCountry()
+                        }}
+                        refreshing={false}
+                    />
+                </View>}
         </View >
     )
 }
@@ -173,18 +152,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
 
-    selectInput: {
-        flexDirection: 'row',
-        height: 50,
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        backgroundColor: 'rgba(124, 119, 119, 0.15)',
-        borderRadius: 5,
-        // width: '80%',
-        alignSelf: 'center',
-        paddingHorizontal: 24,
-        fontSize: 16,
-    },
 
     containerStatus: {
         marginTop: 10,
@@ -192,7 +159,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        //  backgroundColor: '#F0F0F0'
 
     },
 
@@ -201,7 +167,6 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingRight: 90,
         justifyContent: 'center',
-        // backgroundColor: 'black'
 
     },
 
@@ -211,7 +176,6 @@ const styles = StyleSheet.create({
         padding: 20,
         marginHorizontal: 10,
         borderRadius: 5
-        // backgroundColor: 'red'
     },
 
     title: {
