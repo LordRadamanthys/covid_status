@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { View, Picker, Text, StyleSheet, Image, Dimensions } from 'react-native'
+import { View, Picker, Text, StyleSheet, Image, Dimensions, FlatList } from 'react-native'
 import Constants from 'expo-constants'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import statesBrazil from '../../../services/StatesBrazil'
 import { Feather } from '@expo/vector-icons'
 import { BarChart, Grid } from 'react-native-svg-charts'
+import CovidInterface from '../../../Interfaces/CovidData'
 // import {
 //     LineChart,
 //     BarChart,
@@ -16,6 +17,7 @@ import { BarChart, Grid } from 'react-native-svg-charts'
 import api from '../../../services/api';
 import { ScrollView } from 'react-native-gesture-handler'
 import CardState from '../../../components/card_states'
+import formatCurrency from '../../../functions/formatCurrency'
 
 
 
@@ -25,7 +27,7 @@ const TabPersonal = () => {
     const [statesDeaths, setStateDeaths] = useState(0)
     const [statesCases, setStateCases] = useState(0)
 
-    const [dataStates, setDataStates] = useState([])
+    const [dataStates, setDataStates] = useState<Array<CovidInterface>>()
     const [dataCountry, setDataCountry] = useState()
     const [dataCountryDeaths, setDataCountryDeaths] = useState()
     const [dataCountryCases, setDataCountryCases] = useState()
@@ -36,44 +38,13 @@ const TabPersonal = () => {
         setSelectedPickerCity(value)
     }
 
-    const fill = 'rgb(255,000, 000,0.8)'
-    const data = [undefined, 50, undefined, 10, undefined]
-    const CUT_OFF = 20
-    const Labels = ({ x, y, bandwidth, data }) => (
-        data.map((value, index) => (
-            <Text
-                key={index}
-                x={x(index) + (bandwidth / 2)}
-                y={value < CUT_OFF ? y(value) - 10 : y(value) + 15}
-                fontSize={14}
-                fill={value >= CUT_OFF ? 'white' : 'black'}
-                alignmentBaseline={'middle'}
-                textAnchor={'middle'}
-            >
-                {value}
-            </Text>
-        ))
-    )
 
 
-    async function getAllStatusOfState(state: string = 'sp') {
-        api.get(`v1/brazil/uf/${state}`).then(response => {
+    async function getAllStatusOfState() {
+        api.get(`v1`).then(response => {
 
-            const formatDate = {
-                labels: ["Mortes", "Casos", "suspeitos"],
-                datasets: [
-                    {
-                        data: [undefined, response.data.deaths, undefined, response.data.cases, undefined, response.data.suspects, undefined]
-                    }
-                ]
-            };
-
-            const dataTop = [undefined, Number(response.data.deaths), undefined, Number(response.data.cases), undefined, Number(response.data.suspects)]
-            // setStateDeaths(response.data.deaths)
-            // setStateCases(response.data.cases)
-            setDataStates(dataTop)
-
-
+            setDataStates(response.data.data)
+            //  console.log(response.data.data)
         }).catch(erro => {
             console.log(erro)
         })
@@ -82,7 +53,7 @@ const TabPersonal = () => {
 
     function getFormatData() {
         const date = new Date()
-        
+
         if (date.getMonth() > 9) {
             return `${date.getFullYear()}${date.getMonth()}${date.getDate()}`
         } else {
@@ -115,60 +86,44 @@ const TabPersonal = () => {
     }
 
 
-    const dataInit = {
-        labels: ["", "", "", ""],
-        datasets: [
-            {
-                data: [0, 0, 0, 0]
-
-            },
-
-        ]
-    };
 
 
-    const chartConfig = {
-        backgroundGradientFrom: "#5799F9",
-        // backgroundGradientFromOpacity: 1,
-        backgroundGradientTo: "#5799F9",
-        //  backgroundGradientToOpacity: 0.5,
-        color: (opacity = 1) => `rgba(255, 255, 255)`,
-        strokeWidth: 3, // optional, default 3
-        barPercentage: 1.5,
 
-        useShadowColorFromDataset: false // optional
-    };
 
-    function numberWithCommas(x: number) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
+  
     useEffect(() => {
         getStatusOfCountry()
         const value = !selectedPickerCity ? route.params : selectedPickerCity
-        getAllStatusOfState(value)
+        getAllStatusOfState()
         // getStatusOfStateToday()
     }, [selectedPickerCity])
+
+
+    const renderItem = ({ item }) => {
+
+        return <CardState title={item.state} deaths={222} cases={222} />
+    }
 
     return (
         <View style={styles.container}>
 
             <View style={styles.containerStatus}>
-                <Text style={[styles.title, { marginLeft: 100 }]}>Total</Text>
+                <Text style={[styles.title]}>Total Brasil</Text>
                 <View style={styles.containerDataStatus}>
                     <View style={[styles.status, { backgroundColor: '#CE2727' }]}>
-                        <Text style={{ color: '#fff', fontFamily: 'Inter_500Medium' }}>{`${numberWithCommas((Number(dataCountryDeaths)))}`}</Text>
+                        <Text style={{ color: '#fff', fontFamily: 'Inter_500Medium' }}>{`${formatCurrency((Number(dataCountryDeaths)))}`}</Text>
                         <Text style={{ color: '#fff', fontFamily: 'Inter_400Regular' }}>Mortes</Text>
                     </View>
 
                     <View style={[styles.status, { backgroundColor: '#FFD600' }]}>
-                        <Text style={{ color: 'black', fontFamily: 'Inter_500Medium' }}>{`${numberWithCommas((Number(dataCountryConfirmed)))}`}</Text>
+                        <Text style={{ color: 'black', fontFamily: 'Inter_500Medium' }}>{`${formatCurrency((Number(dataCountryConfirmed)))}`}</Text>
                         <Text style={{ color: 'black', fontFamily: 'Inter_400Regular' }}>Casos</Text>
                     </View>
 
                 </View>
             </View>
 
-            <View style={styles.pickerSelectCityContainer}>
+            {/* <View style={styles.pickerSelectCityContainer}>
                 <View style={styles.selectInput}>
                     <Feather style={{ marginEnd: 10 }} name="map" size={25} color="#4799F7" />
                     <Picker
@@ -186,13 +141,18 @@ const TabPersonal = () => {
                     </Picker>
                 </View>
 
+            </View> */}
+            <View>
+                <FlatList
+                    data={dataStates}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.id}
+                />
             </View>
-
-            <CardState />
+            {/* <CardState /> */}
         </View >
     )
 }
-
 
 const styles = StyleSheet.create({
 
@@ -228,10 +188,11 @@ const styles = StyleSheet.create({
 
     containerStatus: {
         marginTop: 10,
+        paddingHorizontal: 10,
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#F0F0F0'
+        //  backgroundColor: '#F0F0F0'
 
     },
 
@@ -256,7 +217,7 @@ const styles = StyleSheet.create({
     title: {
 
         fontFamily: 'Inter_500Medium',
-        fontSize: 22,
+        fontSize: 21,
         color: false ? '#fff' : '#585858',
     },
 })
