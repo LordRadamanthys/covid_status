@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, Animated, Easing } from 'react-native'
 import AppIntroSlider from 'react-native-app-intro-slider';
 import { Feather } from '@expo/vector-icons'
-import Login from '../Login';
+// import Login from '../Login';
+import Home from '../Home';
 
 const slides = [
     {
@@ -102,7 +103,7 @@ const Intro = () => {
                         renderNextButton={_renderNextButton}
                     />
                 </View>
-                : <Login />
+                : <Home />
             }
         </>
     )

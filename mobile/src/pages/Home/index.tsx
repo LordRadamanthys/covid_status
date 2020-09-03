@@ -1,18 +1,27 @@
-import React from 'react'
+import React ,{useContext, useEffect}from 'react'
 import { View, Picker, Text, StyleSheet, Image } from 'react-native'
 import Constants from 'expo-constants'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import TabPersonal from './Tabs/personal';
-import TabWorld from './Tabs/world';
-
+import TabPersonal from './Tabs/Personal/personal';
+import TabWorld from './Tabs/World/world';
+import DarkContext from '../../services/context'
+import styleWhite from './styles'
+import stylesDark from './stylesDark'
 const Home = () => {
+    
+    const {setDark,darkmode} = useContext(DarkContext)
+    const styles = darkmode ? stylesDark:styleWhite 
     const Tab = createMaterialTopTabNavigator();
+    
 
+    useEffect(()=>{
+        setDark(true)
+        
+    },[])
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Image style={{ width: 50, height: 50 }} source={require('../../assets/logo.png')} />
-                <Text style={[styles.textHeader, { alignSelf: 'center', marginLeft: 20 }]}>Hi Mateus </Text>
                 <View style={styles.calendarInfoHeader}>
                     <Text style={styles.textHeader}>Sao Paulo, Brasil</Text>
                     <Text style={[styles.textHeader, { alignSelf: 'flex-end' }]}>21/08/2020</Text>
@@ -23,9 +32,9 @@ const Home = () => {
                 tabStyle: { borderRadius: 5 },
                 labelStyle: { fontFamily: 'Inter_400Regular', fontSize: 19 },
                 activeTintColor: '#FFF',
-                inactiveTintColor: false? '#fff' : '#585858',
+                inactiveTintColor: darkmode? '#585858' : '#fff',
                 pressColor: '#4799F7',
-                style: { backgroundColor: false ?  '#232222' : '#F0F0F0', elevation: 9 },
+                style: { backgroundColor: darkmode ?  '#232222' : '#F0F0F0', elevation: 9 },
                 indicatorStyle: { height: '100%',  backgroundColor: '#4799F7', borderRadius: 5 },
             }}>
                 <Tab.Screen name="Brasil" component={TabPersonal} />
@@ -36,31 +45,6 @@ const Home = () => {
 }
 
 
-const styles = StyleSheet.create({
 
-    container: {
-        flex: 1,
-        paddingTop: Constants.statusBarHeight + 15,
-        backgroundColor: false ? '#232222' : '#F0F0F0'
-    },
-
-    header: {
-        justifyContent: 'space-between',
-        padding: 30,
-        flexDirection: 'row',
-        backgroundColor: false ? '#232222' : '#F0F0F0'
-    },
-
-    calendarInfoHeader: {
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-    },
-
-    textHeader: {
-        fontSize: 14,
-        color: '#585858',
-        fontFamily: 'Inter_400Regular'
-    },
-})
 
 export default Home

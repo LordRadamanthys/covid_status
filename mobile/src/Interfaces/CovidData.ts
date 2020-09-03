@@ -3,4 +3,6 @@ export default interface CovidInterface {
     deaths: number,
     id: number,
     title: string,
+    uf?: string
+
 }

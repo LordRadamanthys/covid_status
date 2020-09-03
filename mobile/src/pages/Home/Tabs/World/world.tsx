@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { View, StyleSheet, FlatList } from 'react-native'
 import { Feather } from '@expo/vector-icons'
-import CardState from '../../../components/card_states'
+import CardState from '../../../../components/card_states'
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
-import api from '../../../services/api'
+import api from '../../../../services/api'
+import DarkContext from '../../../../services/context'
+import stylesWhite from '../Personal/stylesWhite'
+import stylesDark from '../Personal/stylesDark'
 
 
 const TabWorld = () => {
     const [dataWorld, setDataWorld] = useState()
-
+    const {setDark,darkmode} = useContext(DarkContext)
+    const styles = darkmode ? stylesDark:stylesWhite 
     async function getAllDataWorld() {
         setDataWorld(undefined)
         api.get(`v1/countries`).then(response => {

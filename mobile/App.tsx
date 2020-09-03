@@ -3,6 +3,7 @@ import React from 'react';
 import { AppLoading } from 'expo';
 import { Inter_400Regular, Inter_500Medium, useFonts } from '@expo-google-fonts/inter'
 import Stack from './src/routes/Stack'
+import {DarkModeContext} from './src/services/context';
 
 export default function App() {
 
@@ -19,8 +20,11 @@ export default function App() {
   } else {
     return (
       <>
+        <DarkModeContext >
         <Stack />
-        <StatusBar style="auto" />
+        
+          <StatusBar style="auto" />
+        </DarkModeContext>
       </>
     );
   }

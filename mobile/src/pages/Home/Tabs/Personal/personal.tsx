@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { View, Picker, Text, StyleSheet, Image, Dimensions, FlatList } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 
 import { Feather } from '@expo/vector-icons'
 
-import CovidInterface from '../../../Interfaces/CovidData'
+import CovidInterface from '../../../../Interfaces/CovidData'
 
-import api from '../../../services/api';
-import { ScrollView } from 'react-native-gesture-handler'
-import CardState from '../../../components/card_states'
-import formatCurrency from '../../../functions/formatCurrency'
+import api from '../../../../services/api';
+import CardState from '../../../../components/card_states'
+import formatCurrency from '../../../../functions/formatCurrency'
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
+import stylesWhite from './stylesWhite'
+import stylesDark from './stylesDark'
+import DarkContext from '../../../../services/context'
 
 
 
 const TabPersonal = () => {
+    const {setDark,darkmode} = useContext(DarkContext)
+    const styles = darkmode ? stylesDark:stylesWhite 
     const route = useRoute()
     const [selectedPickerCity, setSelectedPickerCity] = useState('')
     const [statesDeaths, setStateDeaths] = useState(0)
@@ -33,11 +37,14 @@ const TabPersonal = () => {
     async function getAllStatusOfState() {
         setDataStates(undefined)
         api.get(`v1`).then(response => {
-
+            
+            if(response.data.data[0] === undefined) throw ('ops, ocorreu algo de errado')
+            
             setDataStates(response.data.data)
-            //  console.log(response.data.data)
         }).catch(erro => {
-            console.log(erro)
+            alert(erro)
+            setDataStates([])
+            //getAllStatusOfState()
         })
     }
 
@@ -66,14 +73,14 @@ const TabPersonal = () => {
 
     const renderItem = ({ item }) => {
 
-        return <CardState id={item.id} title={item.state} deaths={item.deaths} cases={item.cases} />
+        return <CardState id={item.id} title={item.state} deaths={item.deaths} cases={item.cases} uf={item.uf}/>
     }
 
     return (
         <View style={styles.container}>
 
             <View style={styles.containerStatus}>
-                <Text style={[styles.title]}>Total Brasil</Text>
+                <Text style={styles.title}>Total Brasil</Text>
                 <View style={styles.containerDataStatus}>
                     {!dataCountryDeaths ? <>
                         <ShimmerPlaceHolder style={{ width: 90, height: 90, borderRadius: 5, marginHorizontal: 20 }} autoRun={true} visible={false} />
@@ -132,58 +139,5 @@ const TabPersonal = () => {
         </View >
     )
 }
-
-const styles = StyleSheet.create({
-
-    container: {
-        flex: 1,
-        backgroundColor: false ? '#1C1C1C' : '#FAFAFA'
-    },
-
-    pickerSelectCityContainer: {
-        justifyContent: 'space-between',
-        padding: 10,
-        flexDirection: 'row',
-        //  backgroundColor: '#f3f'
-    },
-
-    calendarInfoHeader: {
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-    },
-
-
-    containerStatus: {
-        marginTop: 10,
-        paddingHorizontal: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-
-    },
-
-    containerDataStatus: {
-        flexDirection: 'row',
-        padding: 10,
-        paddingRight: 90,
-        justifyContent: 'center',
-
-    },
-
-    status: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        marginHorizontal: 10,
-        borderRadius: 5
-    },
-
-    title: {
-
-        fontFamily: 'Inter_500Medium',
-        fontSize: 21,
-        color: false ? '#fff' : '#585858',
-    },
-})
 
 export default TabPersonal
