@@ -1,6 +1,7 @@
 import React,{createContext, useState} from 'react'
 const DarkContext = createContext<Provider>({} as Provider)
 
+
 interface Provider {
     darkmode: boolean,
     setDark: any

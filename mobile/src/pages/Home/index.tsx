@@ -15,7 +15,7 @@ const Home = () => {
     
 
     useEffect(()=>{
-        setDark(true)
+      // setDark(true)
         
     },[])
     return (

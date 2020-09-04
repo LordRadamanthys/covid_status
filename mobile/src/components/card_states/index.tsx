@@ -34,12 +34,12 @@ export default CardState
 
 const styles = StyleSheet.create({
     container: {
-        margin: 10,
+        margin: 30,
         padding: 6,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(160, 160, 160, 0.15)',
-        borderRadius: 5,
+        borderRadius: 10
 
 
     },
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     },
 
     info: {
-        width: 150,
+        width: 120,
         height: 100,
         marginVertical: 10,
         backgroundColor: '#CE2727',
