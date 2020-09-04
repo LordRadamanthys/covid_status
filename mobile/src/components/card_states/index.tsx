@@ -34,7 +34,8 @@ export default CardState
 
 const styles = StyleSheet.create({
     container: {
-        margin: 30,
+        marginHorizontal: 30,
+        marginVertical: 10,
         padding: 6,
         justifyContent: 'center',
         alignItems: 'center',

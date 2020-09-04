@@ -26,7 +26,7 @@ const stylesDark = StyleSheet.create({
     title: {
         fontFamily: 'Inter_500Medium',
         fontSize: 24,
-        color: '#585858'
+        color: '#fff'
     },
 
     bodySlide: {
@@ -38,7 +38,7 @@ const stylesDark = StyleSheet.create({
     subtitle: {
         fontFamily: 'Inter_400Regular',
         fontSize: 18,
-        color: '#585858',
+        color: '#fff',
         marginTop: 50
     },
 

@@ -24,20 +24,20 @@ const Intro = () => {
             image: darkmode ? require('../../assets/darkScreen1.png') : require('../../assets/world.png'),
             backgroundColor: '#59b2ab',
         },
-        {
-            key: 2,
-            title: 'Covid Status',
-            text: 'Mostraremos dicas de como você pode se cuidar e sugerir matérias sobre o assunto',
-            image: darkmode ? require('../../assets/darkScreen2.png') : require('../../assets/woman_medical.png'),
-            backgroundColor: '#febe29',
-        },
-        {
-            key: 3,
-            title: 'Covid Status',
-            text: 'Mas primeiro precisamos de algumas informações para seu uso no app',
-            image: darkmode ? require('../../assets/darkScreen3.png') : require('../../assets/social_distancing.png'),
-            backgroundColor: '#22bcb5',
-        }
+        // {
+        //     key: 2,
+        //     title: 'Covid Status',
+        //     text: 'Mostraremos dicas de como você pode se cuidar e sugerir matérias sobre o assunto',
+        //     image: darkmode ? require('../../assets/darkScreen2.png') : require('../../assets/woman_medical.png'),
+        //     backgroundColor: '#febe29',
+        // },
+        // {
+        //     key: 3,
+        //     title: 'Covid Status',
+        //     text: 'Mas primeiro precisamos de algumas informações para seu uso no app',
+        //     image: darkmode ? require('../../assets/darkScreen3.png') : require('../../assets/social_distancing.png'),
+        //     backgroundColor: '#22bcb5',
+        // }
     ]
 
 
